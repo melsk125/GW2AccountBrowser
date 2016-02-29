@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <integer-array name="material_ids">
+    <item>5</item>
+    <item>6</item>
+    <item>29</item>
+    <item>30</item>
+    <item>37</item>
+    <item>38</item>
+    <item>46</item>
+  </integer-array>
+</resources>

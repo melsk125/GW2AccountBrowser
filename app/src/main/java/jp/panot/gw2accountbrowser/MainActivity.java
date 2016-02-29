@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import jp.panot.gw2accountbrowser.fragments.AccountFragment;
 import jp.panot.gw2accountbrowser.fragments.BankFragment;
+import jp.panot.gw2accountbrowser.fragments.MaterialFragment;
 import jp.panot.gw2accountbrowser.fragments.WalletFragment;
 
 public class MainActivity extends AppCompatActivity
@@ -99,7 +100,6 @@ public class MainActivity extends AppCompatActivity
         ft.commit();
       }
     } else if (id == R.id.nav_bank) {
-      Toast.makeText(this, "Bank", Toast.LENGTH_SHORT).show();
       if (!(currentFragment instanceof BankFragment)) {
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.main_container, new BankFragment());
@@ -107,6 +107,11 @@ public class MainActivity extends AppCompatActivity
       }
     } else if (id == R.id.nav_storage) {
       Toast.makeText(this, "Material Storage", Toast.LENGTH_SHORT).show();
+      if (!(currentFragment instanceof MaterialFragment)) {
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.main_container, new MaterialFragment());
+        ft.commit();
+      }
     } else if (id == R.id.nav_manage_accounts) {
       Toast.makeText(this, "Manage Accounts", Toast.LENGTH_SHORT).show();
     }
