@@ -11,9 +11,9 @@ import android.support.annotation.Nullable;
 
 import jp.panot.gw2accountbrowser.data.GW2Contract.CurrencyEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.GuildEntry;
-import jp.panot.gw2accountbrowser.data.GW2Contract.WorldEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.ItemEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.MaterialEntry;
+import jp.panot.gw2accountbrowser.data.GW2Contract.WorldEntry;
 
 
 /**
