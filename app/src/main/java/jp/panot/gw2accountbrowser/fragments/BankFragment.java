@@ -1,4 +1,4 @@
-package jp.panot.gw2accountbrowser;
+package jp.panot.gw2accountbrowser.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -32,7 +32,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jp.panot.gw2accountbrowser.R;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
+import jp.panot.gw2accountbrowser.fetch.GW2Fetch;
+import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.CommonUtils;
 
 /**
  * Created by panot on 2/25/16.
@@ -42,7 +46,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
 
   private static final int ITEM_LOADER = 0;
 
-  private AccountBrowserFetch mFetch;
+  private GW2Fetch mFetch;
   private BankAdapter mBankAdapter;
 
   private int mBankSize;
@@ -70,7 +74,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
   @Nullable
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    mFetch = AccountBrowserFetch.getInstance(getActivity().getApplicationContext());
+    mFetch = GW2Fetch.getInstance(getActivity().getApplicationContext());
     mBankAdapter = new BankAdapter(getActivity());
 
     View rootView = inflater.inflate(R.layout.fragment_bank, null);
@@ -119,7 +123,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
       }
     };
 
-    String url = Utility.getBank(Utility.getAccessToken());
+    String url = UrlUtils.getBank(CommonUtils.getAccessToken());
     mFetch.fetchJsonArray(url, bankListener, errorListener);
 
     return rootView;
@@ -150,9 +154,9 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
         }
       }
     }
-    String ids = Utility.makeQuestionmarks(itemIds.size());
+    String ids = CommonUtils.makeQuestionmarks(itemIds.size());
     String[] selectionArgs = new String[itemIds.size() + 2];
-    int julianToday = Utility.getJulianDay();
+    int julianToday = CommonUtils.getJulianDay();
     String selection = GW2Contract.ItemEntry.TABLE_NAME +
         "." + GW2Contract.ItemEntry.COLUMN_ID + " IN ( " + ids + " ) AND " +
         GW2Contract.ItemEntry.COLUMN_LATEST_UPDATE + " > ? - ? ";

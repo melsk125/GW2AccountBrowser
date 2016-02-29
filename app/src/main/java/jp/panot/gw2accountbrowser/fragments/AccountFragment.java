@@ -1,4 +1,4 @@
-package jp.panot.gw2accountbrowser;
+package jp.panot.gw2accountbrowser.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -25,7 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import jp.panot.gw2accountbrowser.R;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
+import jp.panot.gw2accountbrowser.fetch.GW2Fetch;
+import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.CommonUtils;
 
 /**
  * Created by panot on 2/22/16.
@@ -69,18 +73,18 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
   public static final int COL_GUILD_TAG = 3;
   public static final int COL_GUILD_LATEST_UPDATE = 4;
 
-  private AccountBrowserFetch mFetch;
+  private GW2Fetch mFetch;
   private GuildAdapter mGuildAdapter;
   private ArrayAdapter<String> mCharacterAdapter;
 
   @Nullable
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    mFetch = AccountBrowserFetch.getInstance(getActivity().getApplicationContext());
+    mFetch = GW2Fetch.getInstance(getActivity().getApplicationContext());
     mGuildAdapter = new GuildAdapter(getActivity(), null, 0);
     mCharacterAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_character,
         R.id.list_character_textview);
-    mToken = Utility.getAccessToken();
+    mToken = CommonUtils.getAccessToken();
 
     View view = inflater.inflate(R.layout.fragment_account, null);
     getActivity().setTitle("Account");
@@ -141,7 +145,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       }
     };
 
-    String url = Utility.getAccountURL(mToken);
+    String url = UrlUtils.getAccountURL(mToken);
     mFetch.fetchJsonObject(url, successListener, errorListener);
 
     final Response.Listener<JSONArray> characterListener = new Response.Listener<JSONArray>() {
@@ -158,7 +162,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       }
     };
 
-    String characterUrl = Utility.getAllCharacterName(mToken);
+    String characterUrl = UrlUtils.getAllCharacterName(mToken);
     mFetch.fetchJsonArray(characterUrl, characterListener, errorListener);
 
     return view;
@@ -181,7 +185,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       return null;
     }
     Uri worldUri = GW2Contract.WorldEntry.buildWorld(mWorldId);
-    int julianToday = Utility.getJulianDay();
+    int julianToday = CommonUtils.getJulianDay();
     String selection = GW2Contract.WorldEntry.COLUMN_LATEST_UPDATE + " > ? - ? ";
     String[] selectionArgs = new String[] {String.valueOf(julianToday),
         String.valueOf(GW2Contract.WorldEntry.UPDATE_FREQUENCY)};
@@ -193,7 +197,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       Log.d(LOG_TAG, "meh");
       return null;
     }
-    String ids = Utility.makeQuestionmarks(mGuildIds.length);
+    String ids = CommonUtils.makeQuestionmarks(mGuildIds.length);
 
     Uri guildUri = GW2Contract.GuildEntry.CONTENT_URI;
 
@@ -202,7 +206,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
         GW2Contract.GuildEntry.COLUMN_LATEST_UPDATE + " > ? - ? ";
     String[] selectionArgs = new String[mGuildIds.length + 2];
     System.arraycopy(mGuildIds, 0, selectionArgs, 0, mGuildIds.length);
-    int julianToday = Utility.getJulianDay();
+    int julianToday = CommonUtils.getJulianDay();
     selectionArgs[mGuildIds.length] = String.valueOf(julianToday);
     selectionArgs[mGuildIds.length + 1] = String.valueOf(GW2Contract.GuildEntry.UPDATE_FREQUENCY);
     return new CursorLoader(getActivity(), guildUri, GUILD_COLUMNS, selection, selectionArgs, null);

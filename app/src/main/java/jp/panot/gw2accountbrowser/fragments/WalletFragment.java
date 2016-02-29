@@ -1,4 +1,4 @@
-package jp.panot.gw2accountbrowser;
+package jp.panot.gw2accountbrowser.fragments;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -31,7 +31,11 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import jp.panot.gw2accountbrowser.R;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
+import jp.panot.gw2accountbrowser.fetch.GW2Fetch;
+import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.CommonUtils;
 
 /**
  * Created by panot on 2/25/16.
@@ -41,7 +45,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
 
   private static final int CURRENCY_LOADER = 0;
 
-  private AccountBrowserFetch mFetch;
+  private GW2Fetch mFetch;
   private WalletAdapter mWalletAdapter;
 
   private Map<Integer, Integer> mWallet;
@@ -69,7 +73,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    mFetch = AccountBrowserFetch.getInstance(getActivity().getApplicationContext());
+    mFetch = GW2Fetch.getInstance(getActivity().getApplicationContext());
     mWalletAdapter = new WalletAdapter(getActivity(), null, 0);
 
     View view = inflater.inflate(R.layout.fragment_wallet, null);
@@ -119,7 +123,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
       }
     };
 
-    String url = Utility.getWallet(Utility.getAccessToken());
+    String url = UrlUtils.getWallet(CommonUtils.getAccessToken());
     mFetch.fetchJsonArray(url, walletListener, errorListener);
 
     return view;
@@ -138,7 +142,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
   private Loader<Cursor> createCurrencyLoader() {
     Uri currencyUri = GW2Contract.CurrencyEntry.CONTENT_URI;
     Log.d(LOG_TAG, "currencyUri: " + currencyUri);
-    int julianToday = Utility.getJulianDay();
+    int julianToday = CommonUtils.getJulianDay();
     String selection = GW2Contract.CurrencyEntry.COLUMN_LATEST_UPDATE + " > ? - ?";
     String[] selectionArgs = new String[]{String.valueOf(julianToday),
         String.valueOf(GW2Contract.CurrencyEntry.UPDATE_FREQUENCY)};

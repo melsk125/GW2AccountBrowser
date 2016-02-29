@@ -1,4 +1,4 @@
-package jp.panot.gw2accountbrowser;
+package jp.panot.gw2accountbrowser.fetch;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -20,28 +20,31 @@ import org.json.JSONObject;
 
 import java.util.Vector;
 
+import jp.panot.gw2accountbrowser.LruBitmapCache;
+import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.CommonUtils;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
 
 /**
  * Created by panot on 2/22/16.
  */
-public class AccountBrowserFetch {
-  private static final String LOG_TAG = AccountBrowserFetch.class.getSimpleName();
+public class GW2Fetch {
+  private static final String LOG_TAG = GW2Fetch.class.getSimpleName();
 
-  private static AccountBrowserFetch mInstance;
+  private static GW2Fetch mInstance;
   private RequestQueue mRequestQueue;
   private ImageLoader mImageLoader;
   private final Context mContext;
 
-  private AccountBrowserFetch(Context context) {
+  private GW2Fetch(Context context) {
     mContext = context;
     mRequestQueue = getRequestQueue();
     mImageLoader = new ImageLoader(mRequestQueue, LruBitmapCache.getInstance(context));
   }
 
-  public static synchronized AccountBrowserFetch getInstance(Context context) {
+  public static synchronized GW2Fetch getInstance(Context context) {
     if (mInstance == null) {
-      mInstance = new AccountBrowserFetch(context);
+      mInstance = new GW2Fetch(context);
     }
     return mInstance;
   }
@@ -94,7 +97,7 @@ public class AccountBrowserFetch {
 
   public void updateWorlds(int[] ids) {
     Log.v(LOG_TAG, "updateWorlds");
-    String url = Utility.getWorldsURL(ids);
+    String url = UrlUtils.getWorldsURL(ids);
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
@@ -112,7 +115,7 @@ public class AccountBrowserFetch {
             worldValues.put(GW2Contract.WorldEntry.COLUMN_WORLD_ID, id);
             worldValues.put(GW2Contract.WorldEntry.COLUMN_NAME, name);
             worldValues.put(GW2Contract.WorldEntry.COLUMN_POPULATION, population);
-            worldValues.put(GW2Contract.WorldEntry.COLUMN_LATEST_UPDATE, Utility.getJulianDay());
+            worldValues.put(GW2Contract.WorldEntry.COLUMN_LATEST_UPDATE, CommonUtils.getJulianDay());
 
             cVVector.add(worldValues);
           }
@@ -130,7 +133,7 @@ public class AccountBrowserFetch {
   public void updateGuilds(String[] ids) {
     Log.v(LOG_TAG, "updateGuilds");
     for (String id : ids) {
-      String url = Utility.getGuildInfoURL(id);
+      String url = UrlUtils.getGuildInfoURL(id);
 
       fetchJsonObject(url, new Response.Listener<JSONObject>() {
         @Override
@@ -144,7 +147,7 @@ public class AccountBrowserFetch {
             guildValues.put(GW2Contract.GuildEntry.COLUMN_GUILD_ID, guildId);
             guildValues.put(GW2Contract.GuildEntry.COLUMN_GUILD_NAME, guildName);
             guildValues.put(GW2Contract.GuildEntry.COLUMN_TAG, guildTag);
-            guildValues.put(GW2Contract.GuildEntry.COLUMN_LATEST_UPDATE, Utility.getJulianDay());
+            guildValues.put(GW2Contract.GuildEntry.COLUMN_LATEST_UPDATE, CommonUtils.getJulianDay());
 
             Uri uri = mContext.getContentResolver().insert(GW2Contract.GuildEntry.CONTENT_URI,
                 guildValues);
@@ -162,7 +165,7 @@ public class AccountBrowserFetch {
 
   public void updateCurrencyData() {
     Log.v(LOG_TAG, "updateCurrencyData");
-    String url = Utility.getAllCurrencyInfo();
+    String url = UrlUtils.getAllCurrencyInfo();
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
@@ -184,7 +187,7 @@ public class AccountBrowserFetch {
             currencyValues.put(GW2Contract.CurrencyEntry.COLUMN_ORDER, order);
             currencyValues.put(GW2Contract.CurrencyEntry.COLUMN_ICON, icon);
             currencyValues.put(GW2Contract.CurrencyEntry.COLUMN_LATEST_UPDATE,
-                Utility.getJulianDay());
+                CommonUtils.getJulianDay());
             cVVector.add(currencyValues);
           }
 
@@ -200,7 +203,7 @@ public class AccountBrowserFetch {
 
   public void updateItemData(int[] ids) {
     Log.v(LOG_TAG, "updateItemData");
-    String url = Utility.getItemURL(ids);
+    String url = UrlUtils.getItemURL(ids);
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
@@ -227,7 +230,7 @@ public class AccountBrowserFetch {
             itemValues.put(GW2Contract.ItemEntry.COLUMN_DESCRIPTION, desc);
             itemValues.put(GW2Contract.ItemEntry.COLUMN_ICON, icon);
             itemValues.put(GW2Contract.ItemEntry.COLUMN_JSON, json);
-            itemValues.put(GW2Contract.ItemEntry.COLUMN_LATEST_UPDATE, Utility.getJulianDay());
+            itemValues.put(GW2Contract.ItemEntry.COLUMN_LATEST_UPDATE, CommonUtils.getJulianDay());
             cVVector.add(itemValues);
           }
 

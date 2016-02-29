@@ -14,6 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import jp.panot.gw2accountbrowser.fragments.AccountFragment;
+import jp.panot.gw2accountbrowser.fragments.BankFragment;
+import jp.panot.gw2accountbrowser.fragments.WalletFragment;
+
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
 

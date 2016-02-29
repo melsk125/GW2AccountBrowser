@@ -1,16 +1,14 @@
-package jp.panot.gw2accountbrowser;
+package jp.panot.gw2accountbrowser.util;
 
 import android.net.Uri;
-import android.text.format.Time;
 
 /**
- * Created by panot on 2/22/16.
+ * Created by panot on 2/29/16.
  */
-public class Utility {
+public class UrlUtils {
   private static final String API_BASE_URL = "https://api.guildwars2.com/";
-  private static final String API_V2_BASE_URL = API_BASE_URL + "v2/";
   private static final String API_V1_BASE_URL = API_BASE_URL + "v1/";
-
+  private static final String API_V2_BASE_URL = API_BASE_URL + "v2/";
   private static final String API_ACCOUNT_NODE = "account";
   private static final String API_WORLDS_NODE = "worlds";
   private static final String API_GUILD_DETAILS_NODE = "guild_details.json";
@@ -19,32 +17,10 @@ public class Utility {
   private static final String API_WALLET_NODE = "wallet";
   private static final String API_BANK_NODE = "bank";
   private static final String API_ITEM_NODE = "items";
-
   private static final String ACCESS_TOKEN_PARAM = "access_token";
   private static final String IDS_PARAM = "ids";
   private static final String GUILD_ID_PARAM = "guild_id";
   private static final String PAGINATION_PARAM = "page";
-
-  public static String getAccessToken() {
-    return BuildConfig.GW2_ACCESS_TOKEN;
-  }
-
-  public static int getJulianDay() {
-    Time dayTime = new Time();
-    dayTime.setToNow();
-    return Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-  }
-
-  public static String makeQuestionmarks(int n) {
-    if (n <= 0) {
-      return "";
-    }
-    StringBuilder builder = new StringBuilder("?");
-    for (int i = 1; i < n; i++) {
-      builder.append(",?");
-    }
-    return builder.toString();
-  }
 
   public static String getAccountURL(String token) {
     Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
