@@ -13,6 +13,7 @@ import jp.panot.gw2accountbrowser.data.GW2Contract.CurrencyEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.GuildEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.WorldEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.ItemEntry;
+import jp.panot.gw2accountbrowser.data.GW2Contract.MaterialEntry;
 
 
 /**
@@ -33,6 +34,9 @@ public class GW2Provider extends ContentProvider {
 
   static final int ITEM = 400;
   static final int ITEM_WITH_ID = 401;
+
+  static final int MATERIAL = 500;
+  static final int MATERIAL_WITH_ID = 501;
 
   static UriMatcher buildUriMatcher() {
     final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -57,6 +61,11 @@ public class GW2Provider extends ContentProvider {
     matcher.addURI(authority, GW2Contract.PATH_ITEM, ITEM);
     // jp.panot.gw2accountbrowser/item/1234
     matcher.addURI(authority, GW2Contract.PATH_ITEM + "/#", ITEM_WITH_ID);
+
+    // jp.panot.gw2accountbrowser/material
+    matcher.addURI(authority, GW2Contract.PATH_MATERIAL, MATERIAL);
+    // jp.panot.gw2accountbrowser/material/5
+    matcher.addURI(authority, GW2Contract.PATH_MATERIAL + "/#", MATERIAL_WITH_ID);
 
     return matcher;
   }
@@ -88,6 +97,10 @@ public class GW2Provider extends ContentProvider {
         return ItemEntry.CONTENT_TYPE;
       case ITEM_WITH_ID:
         return ItemEntry.CONTENT_ITEM_TYPE;
+      case MATERIAL:
+        return MaterialEntry.CONTENT_TYPE;
+      case MATERIAL_WITH_ID:
+        return MaterialEntry.CONTENT_ITEM_TYPE;
       default:
         throw new UnsupportedOperationException("Unknown uri: " + uri);
     }
@@ -155,6 +168,18 @@ public class GW2Provider extends ContentProvider {
         c = db.query(ItemEntry.TABLE_NAME, projection, sel, selArgs, null, null, sortOrder);
         break;
       }
+      case MATERIAL: {
+        c = db.query(MaterialEntry.TABLE_NAME, projection, selection, selectionArgs, null, null,
+            sortOrder);
+        break;
+      }
+      case MATERIAL_WITH_ID: {
+        String itemId = MaterialEntry.getMaterialIdFromUri(uri);
+        String sel = MaterialEntry.COLUMN_ID + " = ? ";
+        String[] selArgs = new String[]{String.valueOf(itemId)};
+        c = db.query(MaterialEntry.TABLE_NAME, projection, sel, selArgs, null, null, sortOrder);
+        break;
+      }
       default:
         throw new UnsupportedOperationException("Unknown uri: " + uri);
     }
@@ -209,6 +234,16 @@ public class GW2Provider extends ContentProvider {
         }
         break;
       }
+      case MATERIAL: {
+        long _id = db.insertWithOnConflict(MaterialEntry.TABLE_NAME, null, values,
+            SQLiteDatabase.CONFLICT_REPLACE);
+        if (_id > 0) {
+          returnUri = MaterialEntry.buildMaterialUri(_id);
+        } else {
+          throw new SQLException("Failed to insert row into " + uri);
+        }
+        break;
+      }
       default:
         throw new UnsupportedOperationException("Unknown uri: " + uri);
     }
@@ -234,6 +269,9 @@ public class GW2Provider extends ContentProvider {
         break;
       case ITEM:
         rowsDeleted = db.delete(ItemEntry.TABLE_NAME, selection, selectionArgs);
+        break;
+      case MATERIAL:
+        rowsDeleted = db.delete(MaterialEntry.TABLE_NAME, selection, selectionArgs);
         break;
       default:
         throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -264,6 +302,10 @@ public class GW2Provider extends ContentProvider {
         break;
       case ITEM:
         rowsUpdated = db.updateWithOnConflict(ItemEntry.TABLE_NAME, values,
+            selection, selectionArgs, SQLiteDatabase.CONFLICT_REPLACE);
+        break;
+      case MATERIAL:
+        rowsUpdated = db.updateWithOnConflict(MaterialEntry.TABLE_NAME, values,
             selection, selectionArgs, SQLiteDatabase.CONFLICT_REPLACE);
         break;
       default:
@@ -334,6 +376,22 @@ public class GW2Provider extends ContentProvider {
         try {
           for (ContentValues value : values) {
             long _id = db.insertWithOnConflict(ItemEntry.TABLE_NAME, null, value,
+                SQLiteDatabase.CONFLICT_REPLACE);
+            if (_id > 0) {
+              returnCount++;
+            }
+          }
+          db.setTransactionSuccessful();
+        } finally {
+          db.endTransaction();
+        }
+        break;
+      }
+      case MATERIAL: {
+        db.beginTransaction();
+        try {
+          for (ContentValues value : values) {
+            long _id = db.insertWithOnConflict(MaterialEntry.TABLE_NAME, null, value,
                 SQLiteDatabase.CONFLICT_REPLACE);
             if (_id > 0) {
               returnCount++;
