@@ -78,7 +78,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     mFetch = AccountBrowserFetch.getInstance(getActivity().getApplicationContext());
     mGuildAdapter = new GuildAdapter(getActivity(), null, 0);
-    mCharacterAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_character,
+    mCharacterAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_character,
         R.id.list_character_textview);
     mToken = Utility.getAccessToken();
 
@@ -141,7 +141,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       }
     };
 
-    String url = AccountBrowserFetch.getAccountURL(mToken);
+    String url = Utility.getAccountURL(mToken);
     mFetch.fetchJsonObject(url, successListener, errorListener);
 
     final Response.Listener<JSONArray> characterListener = new Response.Listener<JSONArray>() {
@@ -158,7 +158,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       }
     };
 
-    String characterUrl = AccountBrowserFetch.getAllCharacterName(mToken);
+    String characterUrl = Utility.getAllCharacterName(mToken);
     mFetch.fetchJsonArray(characterUrl, characterListener, errorListener);
 
     return view;
@@ -201,9 +201,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
         "." + GW2Contract.GuildEntry.COLUMN_GUILD_ID + " IN ( " + ids + " ) AND " +
         GW2Contract.GuildEntry.COLUMN_LATEST_UPDATE + " > ? - ? ";
     String[] selectionArgs = new String[mGuildIds.length + 2];
-    for (int i = 0; i < mGuildIds.length; i++) {
-      selectionArgs[i] = mGuildIds[i];
-    }
+    System.arraycopy(mGuildIds, 0, selectionArgs, 0, mGuildIds.length);
     int julianToday = Utility.getJulianDay();
     selectionArgs[mGuildIds.length] = String.valueOf(julianToday);
     selectionArgs[mGuildIds.length + 1] = String.valueOf(GW2Contract.GuildEntry.UPDATE_FREQUENCY);
@@ -275,8 +273,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-      View view = LayoutInflater.from(context).inflate(R.layout.list_item_guild, parent, false);
-      return view;
+      return LayoutInflater.from(context).inflate(R.layout.list_item_guild, parent, false);
     }
 
     @Override

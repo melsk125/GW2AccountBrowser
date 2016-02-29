@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import jp.panot.gw2accountbrowser.data.GW2Contract;
 
@@ -100,7 +99,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
       @Override
       public void onResponse(JSONArray response) {
         try {
-          Set<Integer> itemSet = new HashSet<Integer>();
+          Set<Integer> itemSet = new HashSet<>();
           mBankSize = response.length();
           for (int i = 0; i < response.length(); i++) {
             if (response.isNull(i)) {
@@ -120,7 +119,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
       }
     };
 
-    String url = AccountBrowserFetch.getBank(Utility.getAccessToken());
+    String url = Utility.getBank(Utility.getAccessToken());
     mFetch.fetchJsonArray(url, bankListener, errorListener);
 
     return rootView;
@@ -140,7 +139,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
     Uri itemUri = GW2Contract.ItemEntry.CONTENT_URI;
     Log.d(LOG_TAG, "itemUri: " + itemUri);
 
-    Set<String> itemIds = new HashSet<String>();
+    Set<String> itemIds = new HashSet<>();
     for (JSONObject item : mBank.values()) {
       if (item != null) {
         try {
@@ -215,7 +214,6 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader) {
-    return;
   }
 
   private class BankAdapter extends BaseAdapter {

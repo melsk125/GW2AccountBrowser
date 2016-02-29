@@ -119,7 +119,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
       }
     };
 
-    String url = AccountBrowserFetch.getWallet(Utility.getAccessToken());
+    String url = Utility.getWallet(Utility.getAccessToken());
     mFetch.fetchJsonArray(url, walletListener, errorListener);
 
     return view;
@@ -180,8 +180,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-      View view = LayoutInflater.from(context).inflate(R.layout.list_item_wallet, parent, false);
-      return view;
+      return LayoutInflater.from(context).inflate(R.layout.list_item_wallet, parent, false);
     }
 
     @Override

@@ -28,24 +28,6 @@ import jp.panot.gw2accountbrowser.data.GW2Contract;
 public class AccountBrowserFetch {
   private static final String LOG_TAG = AccountBrowserFetch.class.getSimpleName();
 
-  private static final String API_BASE_URL = "https://api.guildwars2.com/";
-  private static final String API_V1_BASE_URL = API_BASE_URL + "v1/";
-  private static final String API_V2_BASE_URL = API_BASE_URL + "v2/";
-
-  private static final String API_ACCOUNT_NODE = "account";
-  private static final String API_WORLDS_NODE = "worlds";
-  private static final String API_GUILD_DETAILS_NODE = "guild_details.json";
-  private static final String API_CHARACTER_NODE = "characters";
-  private static final String API_CURRENCY_NODE = "currencies";
-  private static final String API_WALLET_NODE = "wallet";
-  private static final String API_BANK_NODE = "bank";
-  private static final String API_ITEM_NODE = "items";
-
-  private static final String ACCESS_TOKEN_PARAM = "access_token";
-  private static final String IDS_PARAM = "ids";
-  private static final String GUILD_ID_PARAM = "guild_id";
-  private static final String PAGINATION_PARAM = "page";
-
   private static AccountBrowserFetch mInstance;
   private RequestQueue mRequestQueue;
   private ImageLoader mImageLoader;
@@ -77,110 +59,6 @@ public class AccountBrowserFetch {
 
   public ImageLoader getImageLoader() {
     return mImageLoader;
-  }
-
-  public static String getAccountURL(String token) {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_ACCOUNT_NODE)
-        .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getWorldsURL(int[] ids) {
-    StringBuilder idsBuilder = new StringBuilder();
-    if (ids.length > 0) {
-      idsBuilder.append(ids[0]);
-    }
-    for (int i = 1; i < ids.length; i++) {
-      idsBuilder.append(",").append(ids[i]);
-    }
-    String idsStr = idsBuilder.toString();
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_WORLDS_NODE)
-        .appendQueryParameter(IDS_PARAM, idsStr)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getWorldsURL(int id) {
-    return getWorldsURL(new int[]{id});
-  }
-
-  public static String getGuildInfoURL(String id) {
-    Uri uri = Uri.parse(API_V1_BASE_URL).buildUpon()
-        .appendPath(API_GUILD_DETAILS_NODE)
-        .appendQueryParameter(GUILD_ID_PARAM, id)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getAllCharacterName(String token) {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_CHARACTER_NODE)
-        .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getAllCharactersInfoURL(String token) {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_CHARACTER_NODE)
-        .appendQueryParameter(PAGINATION_PARAM, "0")
-        .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getCharacterInfoURL(String token, String name) {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_CHARACTER_NODE)
-        .appendEncodedPath(name)
-        .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getAllCurrencyInfo() {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_CURRENCY_NODE)
-        .appendQueryParameter(PAGINATION_PARAM, "0")
-        .build();
-    return uri.toString();
-  }
-
-  public static String getWallet(String token) {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_ACCOUNT_NODE)
-        .appendPath(API_WALLET_NODE)
-        .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getItemURL(int[] ids) {
-    StringBuilder builder = new StringBuilder();
-    if (ids.length > 0) {
-      builder.append(ids[0]);
-    }
-    for (int i = 1; i < ids.length; i++) {
-      builder.append(",").append(ids[i]);
-    }
-    String idsStr = builder.toString();
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_ITEM_NODE)
-        .appendQueryParameter(IDS_PARAM, idsStr)
-        .build();
-    return uri.toString();
-  }
-
-  public static String getBank(String token) {
-    Uri uri = Uri.parse(API_V2_BASE_URL).buildUpon()
-        .appendPath(API_ACCOUNT_NODE)
-        .appendPath(API_BANK_NODE)
-        .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
-        .build();
-    return uri.toString();
   }
 
   private static final Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -216,13 +94,13 @@ public class AccountBrowserFetch {
 
   public void updateWorlds(int[] ids) {
     Log.v(LOG_TAG, "updateWorlds");
-    String url = getWorldsURL(ids);
+    String url = Utility.getWorldsURL(ids);
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
       public void onResponse(JSONArray response) {
         try {
-          Vector<ContentValues> cVVector = new Vector<ContentValues>(response.length());
+          Vector<ContentValues> cVVector = new Vector<>(response.length());
 
           for (int i = 0; i < response.length(); i++) {
             JSONObject world = response.getJSONObject(i);
@@ -251,9 +129,8 @@ public class AccountBrowserFetch {
 
   public void updateGuilds(String[] ids) {
     Log.v(LOG_TAG, "updateGuilds");
-    for (int i = 0; i < ids.length; i++) {
-      String id = ids[i];
-      String url = getGuildInfoURL(id);
+    for (String id : ids) {
+      String url = Utility.getGuildInfoURL(id);
 
       fetchJsonObject(url, new Response.Listener<JSONObject>() {
         @Override
@@ -272,7 +149,7 @@ public class AccountBrowserFetch {
             Uri uri = mContext.getContentResolver().insert(GW2Contract.GuildEntry.CONTENT_URI,
                 guildValues);
             if (uri == null) {
-              Log.e(LOG_TAG, "insert failed: " + uri.toString());
+              Log.e(LOG_TAG, "insert failed: uri is null");
             }
           } catch (JSONException e) {
             Log.e(LOG_TAG, "JSONException", e);
@@ -285,13 +162,13 @@ public class AccountBrowserFetch {
 
   public void updateCurrencyData() {
     Log.v(LOG_TAG, "updateCurrencyData");
-    String url = getAllCurrencyInfo();
+    String url = Utility.getAllCurrencyInfo();
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
       public void onResponse(JSONArray response) {
         try {
-          Vector<ContentValues> cVVector = new Vector<ContentValues>(response.length());
+          Vector<ContentValues> cVVector = new Vector<>(response.length());
           for (int i = 0; i < response.length(); i++) {
             JSONObject currency = response.getJSONObject(i);
             int id = currency.getInt("id");
@@ -323,13 +200,13 @@ public class AccountBrowserFetch {
 
   public void updateItemData(int[] ids) {
     Log.v(LOG_TAG, "updateItemData");
-    String url = getItemURL(ids);
+    String url = Utility.getItemURL(ids);
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
       public void onResponse(JSONArray response) {
         try {
-          Vector<ContentValues> cVVector = new Vector<ContentValues>(response.length());
+          Vector<ContentValues> cVVector = new Vector<>(response.length());
 
           for (int i = 0; i < response.length(); i++) {
             JSONObject item = response.getJSONObject(i);
