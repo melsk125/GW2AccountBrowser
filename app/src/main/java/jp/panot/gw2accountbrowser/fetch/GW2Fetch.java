@@ -115,7 +115,8 @@ public class GW2Fetch {
             worldValues.put(GW2Contract.WorldEntry.COLUMN_WORLD_ID, id);
             worldValues.put(GW2Contract.WorldEntry.COLUMN_NAME, name);
             worldValues.put(GW2Contract.WorldEntry.COLUMN_POPULATION, population);
-            worldValues.put(GW2Contract.WorldEntry.COLUMN_LATEST_UPDATE, CommonUtils.getJulianDay());
+            worldValues.put(GW2Contract.WorldEntry.COLUMN_LATEST_UPDATE,
+                CommonUtils.getJulianDay());
 
             cVVector.add(worldValues);
           }
@@ -147,7 +148,8 @@ public class GW2Fetch {
             guildValues.put(GW2Contract.GuildEntry.COLUMN_GUILD_ID, guildId);
             guildValues.put(GW2Contract.GuildEntry.COLUMN_GUILD_NAME, guildName);
             guildValues.put(GW2Contract.GuildEntry.COLUMN_TAG, guildTag);
-            guildValues.put(GW2Contract.GuildEntry.COLUMN_LATEST_UPDATE, CommonUtils.getJulianDay());
+            guildValues.put(GW2Contract.GuildEntry.COLUMN_LATEST_UPDATE,
+                CommonUtils.getJulianDay());
 
             Uri uri = mContext.getContentResolver().insert(GW2Contract.GuildEntry.CONTENT_URI,
                 guildValues);
@@ -236,6 +238,40 @@ public class GW2Fetch {
 
           int inserted = bulkInsert(GW2Contract.ItemEntry.CONTENT_URI, cVVector);
           Log.d(LOG_TAG, "updateItemData complete. " + inserted + " inserted");
+        } catch (JSONException e) {
+          Log.e(LOG_TAG, "JSONException", e);
+          e.printStackTrace();
+        }
+      }
+    }, errorListener);
+  }
+
+  public void updateMaterialCategoryData() {
+    Log.v(LOG_TAG, "updateMaterialCategoryData");
+    String url = ApiUtils.Materials.url();
+
+    fetchJsonArray(url, new Response.Listener<JSONArray>() {
+      @Override
+      public void onResponse(JSONArray response) {
+        try {
+          Vector<ContentValues> cVVector = new Vector<>(response.length());
+          for (int i = 0; i < response.length(); i++) {
+            JSONObject material = response.getJSONObject(i);
+            int id = material.getInt(ApiUtils.Materials.JSON_ID);
+            String name = material.getString(ApiUtils.Materials.JSON_NAME);
+            int order = material.getInt(ApiUtils.Materials.JSON_ORDER);
+
+            ContentValues materialValues = new ContentValues();
+            materialValues.put(GW2Contract.MaterialEntry.COLUMN_ID, id);
+            materialValues.put(GW2Contract.MaterialEntry.COLUMN_NAME, name);
+            materialValues.put(GW2Contract.MaterialEntry.COLUMN_ORDER, order);
+            materialValues.put(GW2Contract.MaterialEntry.COLUMN_LATEST_UPDATE,
+                CommonUtils.getJulianDay());
+            cVVector.add(materialValues);
+          }
+
+          int inserted = bulkInsert(GW2Contract.MaterialEntry.CONTENT_URI, cVVector);
+          Log.d(LOG_TAG, "updateMaterialCategoryData complete. " + inserted + " inserted");
         } catch (JSONException e) {
           Log.e(LOG_TAG, "JSONException", e);
           e.printStackTrace();
