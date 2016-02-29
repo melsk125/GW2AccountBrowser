@@ -18,6 +18,7 @@ public class GW2Contract {
   public static final String PATH_GUILD = "guild";
   public static final String PATH_CURRENCY = "currency";
   public static final String PATH_ITEM = "item";
+  public static final String PATH_MATERIAL = "material";
 
   /* Inner class that defines the table contents of the world table. */
   public static final class WorldEntry implements BaseColumns {
@@ -170,6 +171,43 @@ public class GW2Contract {
     }
 
     public static String getItemIdFromUri(Uri uri) {
+      return uri.getPathSegments().get(1);
+    }
+  }
+
+  /* Inner class that defines the table contents of the material category table. */
+  public static final class MaterialEntry implements BaseColumns {
+    public static final Uri CONTENT_URI =
+        BASE_CONTENT_URI.buildUpon().appendPath(PATH_MATERIAL).build();
+
+    public static final String CONTENT_TYPE =
+        ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MATERIAL;
+    public static final String CONTENT_ITEM_TYPE =
+        ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MATERIAL;
+
+    public static final String TABLE_NAME = "material";
+
+    // Material category ID from field "id". INTEGER
+    public static final String COLUMN_ID = "id";
+    // Material category name from field "name". TEXT
+    public static final String COLUMN_NAME = "name";
+    // Number that indicates order of this material category in a list of currencies "order".
+    // INTEGER
+    public static final String COLUMN_ORDER = "cat_order";
+    // Julian date of latest update. INTEGER
+    public static final String COLUMN_LATEST_UPDATE = "latest_update";
+
+    public static final int UPDATE_FREQUENCY = 7;
+
+    public static Uri buildMaterialUri(long id) {
+      return ContentUris.withAppendedId(CONTENT_URI, id);
+    }
+
+    public Uri buildMaterial(long id) {
+      return CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+    }
+
+    public static String getMaterialIdFromUri(Uri uri) {
       return uri.getPathSegments().get(1);
     }
   }

@@ -20,6 +20,7 @@ public class ApiUtils {
   private static final String GUILD_DETAILS_NODE = "guild_details.json";
   private static final String CURRENCY_NODE = "currencies";
   private static final String ITEM_NODE = "items";
+  private static final String MATERIAL_NODE = "materials";
 
   private static final String ACCESS_TOKEN_PARAM = "access_token";
   private static final String IDS_PARAM = "ids";
@@ -70,6 +71,23 @@ public class ApiUtils {
 
     public static final Uri NODE_URI = Account.NODE_URI.buildUpon()
         .appendPath(BANK_NODE)
+        .build();
+
+    public static String url(String token) {
+      Uri uri = NODE_URI.buildUpon()
+          .appendQueryParameter(ACCESS_TOKEN_PARAM, token)
+          .build();
+      return uri.toString();
+    }
+  }
+
+  public static final class AccountMaterials {
+    public static final String JSON_ID = "id";
+    public static final String JSON_CATEGORY = "category";
+    public static final String JSON_COUNT = "count";
+
+    public static final Uri NODE_URI = Account.NODE_URI.buildUpon()
+        .appendPath(MATERIAL_NODE)
         .build();
 
     public static String url(String token) {
@@ -166,6 +184,23 @@ public class ApiUtils {
 
     public static final Uri NODE_URI = Uri.parse(V2_BASE_URL).buildUpon()
         .appendPath(CURRENCY_NODE)
+        .build();
+
+    public static String url() {
+      Uri uri = NODE_URI.buildUpon()
+          .appendQueryParameter(PAGINATION_PARAM, "0")
+          .build();
+      return uri.toString();
+    }
+  }
+
+  public static final class Materials {
+    public static final String JSON_ID = "id";
+    public static final String JSON_NAME = "name";
+    public static final String JSON_ORDER = "order";
+
+    public static final Uri NODE_URI = Uri.parse(V2_BASE_URL).buildUpon()
+        .appendPath(MATERIAL_NODE)
         .build();
 
     public static String url() {

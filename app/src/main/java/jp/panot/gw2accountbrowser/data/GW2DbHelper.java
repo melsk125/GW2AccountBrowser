@@ -8,6 +8,7 @@ import jp.panot.gw2accountbrowser.data.GW2Contract.CurrencyEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.GuildEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.WorldEntry;
 import jp.panot.gw2accountbrowser.data.GW2Contract.ItemEntry;
+import jp.panot.gw2accountbrowser.data.GW2Contract.MaterialEntry;
 
 /**
  * Created by panot on 2/24/16.
@@ -45,7 +46,7 @@ public class GW2DbHelper extends SQLiteOpenHelper {
         CurrencyEntry.COLUMN_ID + " INTEGER UNIQUE NOT NULL, " +
         CurrencyEntry.COLUMN_NAME + " TEXT NOT NULL, " +
         CurrencyEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
-        CurrencyEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
+        CurrencyEntry.COLUMN_ORDER + " INTEGER UNIQUE NOT NULL, " +
         CurrencyEntry.COLUMN_ICON + " TEXT NOT NULL " +
         " );";
 
@@ -59,10 +60,19 @@ public class GW2DbHelper extends SQLiteOpenHelper {
         ItemEntry.COLUMN_JSON + " TEXT NOT NULL " +
         " );";
 
+    final String SQL_CREATE_MATERIAL_TABLE = "CREATE TABLE " + MaterialEntry.TABLE_NAME + " (" +
+        MaterialEntry._ID + " INTEGER PRIMARY KEY, " +
+        MaterialEntry.COLUMN_LATEST_UPDATE + " INTEGER NOT NULL, " +
+        MaterialEntry.COLUMN_ID + " INTEGER UNIQUE NOT NULL, " +
+        MaterialEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+        MaterialEntry.COLUMN_ORDER + " INTEGER UNIQUE NOT NULL " +
+        " );";
+
     db.execSQL(SQL_CREATE_WORLD_TABLE);
     db.execSQL(SQL_CREATE_GUILD_TABLE);
     db.execSQL(SQL_CREATE_CURRENCY_TABLE);
     db.execSQL(SQL_CREATE_ITEM_TABLE);
+    db.execSQL(SQL_CREATE_MATERIAL_TABLE);
   }
 
   @Override
@@ -71,6 +81,7 @@ public class GW2DbHelper extends SQLiteOpenHelper {
     db.execSQL("DROP TABLE IF EXISTS " + GuildEntry.TABLE_NAME);
     db.execSQL("DROP TABLE IF EXISTS " + CurrencyEntry.TABLE_NAME);
     db.execSQL("DROP TABLE IF EXISTS " + ItemEntry.TABLE_NAME);
+    db.execSQL("DROP TABLE IF EXISTS " + MaterialEntry.TABLE_NAME);
 
     onCreate(db);
   }
