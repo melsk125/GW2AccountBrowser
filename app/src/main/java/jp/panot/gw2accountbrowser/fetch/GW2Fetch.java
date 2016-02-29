@@ -21,9 +21,9 @@ import org.json.JSONObject;
 import java.util.Vector;
 
 import jp.panot.gw2accountbrowser.LruBitmapCache;
+import jp.panot.gw2accountbrowser.data.GW2Contract;
 import jp.panot.gw2accountbrowser.util.ApiUtils;
 import jp.panot.gw2accountbrowser.util.CommonUtils;
-import jp.panot.gw2accountbrowser.data.GW2Contract;
 
 /**
  * Created by panot on 2/22/16.
