@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import jp.panot.gw2accountbrowser.R;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
 import jp.panot.gw2accountbrowser.fetch.GW2Fetch;
-import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.ApiUtils;
 import jp.panot.gw2accountbrowser.util.CommonUtils;
 
 /**
@@ -107,18 +107,16 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
     };
 
     final LoaderManager.LoaderCallbacks<Cursor> cursorLoaderCallbacks = this;
-    final Fragment fragment = this;
-    final LoaderManager lm = getLoaderManager();
 
     // TODO: Extract JSON fields into an external static class.
     final Response.Listener<JSONObject> successListener = new Response.Listener<JSONObject>() {
       @Override
       public void onResponse(JSONObject response) {
         try {
-          String name = response.getString("name");
-          int worldId = response.getInt("world");
-          String created = response.getString("created");
-          JSONArray guildArray = response.getJSONArray("guilds");
+          String name = response.getString(ApiUtils.Account.JSON_NAME);
+          int worldId = response.getInt(ApiUtils.Account.JSON_WORLD);
+          String created = response.getString(ApiUtils.Account.JSON_CREATED);
+          JSONArray guildArray = response.getJSONArray(ApiUtils.Account.JSON_GUILDS);
 
           nameView.setText(name);
           createdDateView.setText(created);
@@ -145,7 +143,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       }
     };
 
-    String url = UrlUtils.getAccountURL(mToken);
+    String url = ApiUtils.Account.url(mToken);
     mFetch.fetchJsonObject(url, successListener, errorListener);
 
     final Response.Listener<JSONArray> characterListener = new Response.Listener<JSONArray>() {
@@ -162,7 +160,7 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
       }
     };
 
-    String characterUrl = UrlUtils.getAllCharacterName(mToken);
+    String characterUrl = ApiUtils.Characters.allNamesUrl(mToken);
     mFetch.fetchJsonArray(characterUrl, characterListener, errorListener);
 
     return view;
@@ -194,7 +192,6 @@ public class AccountFragment extends Fragment implements LoaderManager.LoaderCal
 
   private Loader<Cursor> createGuildCursorLoader() {
     if (mGuildIds == null || mGuildIds.length == 0 || getActivity() == null) {
-      Log.d(LOG_TAG, "meh");
       return null;
     }
     String ids = CommonUtils.makeQuestionmarks(mGuildIds.length);

@@ -34,7 +34,7 @@ import java.util.Map;
 import jp.panot.gw2accountbrowser.R;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
 import jp.panot.gw2accountbrowser.fetch.GW2Fetch;
-import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.ApiUtils;
 import jp.panot.gw2accountbrowser.util.CommonUtils;
 
 /**
@@ -111,8 +111,8 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
         try {
           for (int i = 0; i < response.length(); i++) {
             JSONObject wallet = response.getJSONObject(i);
-            int id = wallet.getInt("id");
-            int value = wallet.getInt("value");
+            int id = wallet.getInt(ApiUtils.Wallet.JSON_ID);
+            int value = wallet.getInt(ApiUtils.Wallet.JSON_VALUE);
             mWallet.put(id, value);
           }
           mWalletAdapter.notifyDataSetChanged();
@@ -123,7 +123,7 @@ public class WalletFragment extends Fragment implements LoaderManager.LoaderCall
       }
     };
 
-    String url = UrlUtils.getWallet(CommonUtils.getAccessToken());
+    String url = ApiUtils.Wallet.url(CommonUtils.getAccessToken());
     mFetch.fetchJsonArray(url, walletListener, errorListener);
 
     return view;

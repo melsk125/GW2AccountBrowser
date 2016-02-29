@@ -35,7 +35,7 @@ import java.util.Set;
 import jp.panot.gw2accountbrowser.R;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
 import jp.panot.gw2accountbrowser.fetch.GW2Fetch;
-import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.ApiUtils;
 import jp.panot.gw2accountbrowser.util.CommonUtils;
 
 /**
@@ -110,7 +110,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
               mBank.put(i, null);
             } else {
               JSONObject item = response.getJSONObject(i);
-              itemSet.add(item.getInt("id"));
+              itemSet.add(item.getInt(ApiUtils.Bank.JSON_ID));
               mBank.put(i, item);
             }
           }
@@ -123,7 +123,7 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
       }
     };
 
-    String url = UrlUtils.getBank(CommonUtils.getAccessToken());
+    String url = ApiUtils.Bank.url(CommonUtils.getAccessToken());
     mFetch.fetchJsonArray(url, bankListener, errorListener);
 
     return rootView;
@@ -263,8 +263,8 @@ public class BankFragment extends Fragment implements LoaderManager.LoaderCallba
       }
 
       try {
-        int itemId = itemJson.getInt("id");
-        int itemCount = itemJson.getInt("count");
+        int itemId = itemJson.getInt(ApiUtils.Bank.JSON_ID);
+        int itemCount = itemJson.getInt(ApiUtils.Bank.JSON_COUNT);
         String itemIcon = mItemIcons.get(itemId);
 
         if (itemIcon != null) {

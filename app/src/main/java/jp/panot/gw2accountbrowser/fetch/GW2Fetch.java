@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import java.util.Vector;
 
 import jp.panot.gw2accountbrowser.LruBitmapCache;
-import jp.panot.gw2accountbrowser.util.UrlUtils;
+import jp.panot.gw2accountbrowser.util.ApiUtils;
 import jp.panot.gw2accountbrowser.util.CommonUtils;
 import jp.panot.gw2accountbrowser.data.GW2Contract;
 
@@ -97,7 +97,7 @@ public class GW2Fetch {
 
   public void updateWorlds(int[] ids) {
     Log.v(LOG_TAG, "updateWorlds");
-    String url = UrlUtils.getWorldsURL(ids);
+    String url = ApiUtils.Worlds.url(ids);
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
@@ -107,9 +107,9 @@ public class GW2Fetch {
 
           for (int i = 0; i < response.length(); i++) {
             JSONObject world = response.getJSONObject(i);
-            int id = world.getInt("id");
-            String name = world.getString("name");
-            String population = world.getString("population");
+            int id = world.getInt(ApiUtils.Worlds.JSON_ID);
+            String name = world.getString(ApiUtils.Worlds.JSON_NAME);
+            String population = world.getString(ApiUtils.Worlds.JSON_POPULATION);
 
             ContentValues worldValues = new ContentValues();
             worldValues.put(GW2Contract.WorldEntry.COLUMN_WORLD_ID, id);
@@ -133,15 +133,15 @@ public class GW2Fetch {
   public void updateGuilds(String[] ids) {
     Log.v(LOG_TAG, "updateGuilds");
     for (String id : ids) {
-      String url = UrlUtils.getGuildInfoURL(id);
+      String url = ApiUtils.Guild.url(id);
 
       fetchJsonObject(url, new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
           try {
-            String guildId = response.getString("guild_id");
-            String guildName = response.getString("guild_name");
-            String guildTag = response.getString("tag");
+            String guildId = response.getString(ApiUtils.Guild.JSON_ID);
+            String guildName = response.getString(ApiUtils.Guild.JSON_NAME);
+            String guildTag = response.getString(ApiUtils.Guild.JSON_TAG);
 
             ContentValues guildValues = new ContentValues();
             guildValues.put(GW2Contract.GuildEntry.COLUMN_GUILD_ID, guildId);
@@ -165,7 +165,7 @@ public class GW2Fetch {
 
   public void updateCurrencyData() {
     Log.v(LOG_TAG, "updateCurrencyData");
-    String url = UrlUtils.getAllCurrencyInfo();
+    String url = ApiUtils.Currencies.url();
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
@@ -174,11 +174,11 @@ public class GW2Fetch {
           Vector<ContentValues> cVVector = new Vector<>(response.length());
           for (int i = 0; i < response.length(); i++) {
             JSONObject currency = response.getJSONObject(i);
-            int id = currency.getInt("id");
-            String name = currency.getString("name");
-            String desc = currency.getString("description");
-            int order = currency.getInt("order");
-            String icon = currency.getString("icon");
+            int id = currency.getInt(ApiUtils.Currencies.JSON_ID);
+            String name = currency.getString(ApiUtils.Currencies.JSON_NAME);
+            String desc = currency.getString(ApiUtils.Currencies.JSON_DESCRIPTION);
+            int order = currency.getInt(ApiUtils.Currencies.JSON_ORDER);
+            String icon = currency.getString(ApiUtils.Currencies.JSON_ICON);
 
             ContentValues currencyValues = new ContentValues();
             currencyValues.put(GW2Contract.CurrencyEntry.COLUMN_ID, id);
@@ -203,7 +203,7 @@ public class GW2Fetch {
 
   public void updateItemData(int[] ids) {
     Log.v(LOG_TAG, "updateItemData");
-    String url = UrlUtils.getItemURL(ids);
+    String url = ApiUtils.Items.url(ids);
 
     fetchJsonArray(url, new Response.Listener<JSONArray>() {
       @Override
@@ -213,15 +213,15 @@ public class GW2Fetch {
 
           for (int i = 0; i < response.length(); i++) {
             JSONObject item = response.getJSONObject(i);
-            int id = item.getInt("id");
-            String name = item.getString("name");
+            int id = item.getInt(ApiUtils.Items.JSON_ID);
+            String name = item.getString(ApiUtils.Items.JSON_NAME);
             String desc;
-            if (!item.isNull("description")) {
-              desc = item.getString("description");
+            if (!item.isNull(ApiUtils.Items.JSON_DESCRIPTION)) {
+              desc = item.getString(ApiUtils.Items.JSON_DESCRIPTION);
             } else {
               desc = "";
             }
-            String icon = item.getString("icon");
+            String icon = item.getString(ApiUtils.Items.JSON_ICON);
             String json = item.toString();
 
             ContentValues itemValues = new ContentValues();
